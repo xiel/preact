@@ -3,7 +3,6 @@ import React, {
 	createElement,
 	cloneElement,
 	findDOMNode,
-	Component,
 	unmountComponentAtNode,
 	createFactory,
 	unstable_batchedUpdates
@@ -28,13 +27,6 @@ describe('preact-compat', () => {
 	});
 
 	describe('render()', () => {
-		it('should be exported', () => {
-			expect(React)
-				.to.have.property('render')
-				.that.is.a('function')
-				.that.equals(render);
-		});
-
 		it('should replace isomorphic content', () => {
 			let root = ce('div');
 			let initialChild = ce('div');
@@ -118,13 +110,6 @@ describe('preact-compat', () => {
 	});
 
 	describe('createElement()', () => {
-		it('should be exported', () => {
-			expect(React)
-				.to.have.property('createElement')
-				.that.is.a('function')
-				.that.equals(createElement);
-		});
-
 		it('should normalize vnodes', () => {
 			let vnode = <div a="b"><a>t</a></div>;
 			let $$typeof = 0xeac7;
@@ -179,15 +164,6 @@ describe('preact-compat', () => {
 			render(<input onBeforeInput={spy} />, scratch);
 			scratch.firstChild.dispatchEvent(createEvent('beforeinput'));
 			expect(spy).to.be.calledOnce;
-		});
-	});
-
-	describe('Component', () => {
-		it('should be exported', () => {
-			expect(React)
-				.to.have.property('Component')
-				.that.is.a('function')
-				.that.equals(Component);
 		});
 	});
 
