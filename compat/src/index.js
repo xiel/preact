@@ -1,6 +1,5 @@
 import { cloneElement as preactCloneElement, createRef, h, Component, options, toChildArray, createContext, Fragment } from 'preact';
 import * as hooks from 'preact/hooks';
-export * from 'preact/hooks';
 import { Suspense as _Suspense, lazy as _lazy, enableSuspense } from './suspense';
 import { assign } from '../../src/util';
 
@@ -191,6 +190,7 @@ enableForwardRef();
 patchComponent(Component);
 enableSuspense();
 
+export * from 'preact/hooks';
 export {
 	version,
 	Children,
