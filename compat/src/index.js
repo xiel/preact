@@ -11,6 +11,7 @@ import { Children } from './children';
 import { forwardRef, enableForwardRef } from './forwardRef';
 import { memo } from './memo';
 import { PureComponent } from './PureComponent';
+import { findDOMNode } from './findDOMNode';
 
 const version = '16.8.0'; // trick libraries to think we are react
 
@@ -168,15 +169,6 @@ let classNameDescriptor = {
 	configurable: true,
 	get() { return this.class; }
 };
-
-/**
- * Get the matching DOM node for a component
- * @param {import('./internal').Component} component
- * @returns {import('./internal').PreactElement | null}
- */
-function findDOMNode(component) {
-	return component && (component.base || component.nodeType === 1 && component) || null;
-}
 
 // Some libraries like `react-virtualized` explicitely check for this.
 Component.prototype.isReactComponent = {};
