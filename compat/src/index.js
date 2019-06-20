@@ -9,6 +9,8 @@ import { render } from './render';
 import { unmountComponentAtNode } from './unmountComponentAtNode';
 import { Children } from './children';
 import { forwardRef, enableForwardRef } from './forwardRef';
+import { memo } from './memo';
+import { PureComponent } from './PureComponent';
 
 const version = '16.8.0'; // trick libraries to think we are react
 
@@ -168,18 +170,6 @@ let classNameDescriptor = {
 };
 
 /**
- * Check if two objects have a different shape
- * @param {object} a
- * @param {object} b
- * @returns {boolean}
- */
-function shallowDiffers(a, b) {
-	for (let i in a) if (!(i in b)) return true;
-	for (let i in b) if (a[i]!==b[i]) return true;
-	return false;
-}
-
-/**
  * Get the matching DOM node for a component
  * @param {import('./internal').Component} component
  * @returns {import('./internal').PreactElement | null}
@@ -188,51 +178,8 @@ function findDOMNode(component) {
 	return component && (component.base || component.nodeType === 1 && component) || null;
 }
 
-/**
- * Component class with a predefined `shouldComponentUpdate` implementation
- */
-class PureComponent extends Component {
-	constructor(props) {
-		super(props);
-		// Some third-party libraries check if this property is present
-		this.isPureReactComponent = true;
-	}
-
-	shouldComponentUpdate(props, state) {
-		return shallowDiffers(this.props, props) || shallowDiffers(this.state, state);
-	}
-}
-
 // Some libraries like `react-virtualized` explicitely check for this.
 Component.prototype.isReactComponent = {};
-
-/**
- * Memoize a component, so that it only updates when the props actually have
- * changed. This was previously known as `React.pure`.
- * @param {import('./internal').FunctionalComponent} c functional component
- * @param {(prev: object, next: object) => boolean} [comparer] Custom equality function
- * @returns {import('./internal').FunctionalComponent}
- */
-function memo(c, comparer) {
-	function shouldUpdate(nextProps) {
-		let ref = this.props.ref;
-		let updateRef = ref==nextProps.ref;
-		if (!updateRef) {
-			ref.call ? ref(null) : (ref.current = null);
-		}
-		return (!comparer
-			? shallowDiffers(this.props, nextProps)
-			: !comparer(this.props, nextProps)) || !updateRef;
-	}
-
-	function Memoed(props) {
-		this.shouldComponentUpdate = shouldUpdate;
-		return h(c, assign({}, props));
-	}
-	Memoed.displayName = 'Memo(' + (c.displayName || c.name) + ')';
-	Memoed._forwarded = true;
-	return Memoed;
-}
 
 // Patch in `UNSAFE_*` lifecycle hooks
 function setUnsafeDescriptor(obj, key) {
