@@ -12,6 +12,7 @@ import { forwardRef, enableForwardRef } from './forwardRef';
 import { memo } from './memo';
 import { PureComponent } from './PureComponent';
 import { findDOMNode } from './findDOMNode';
+import { patchComponent } from './Component';
 
 const version = '16.8.0'; // trick libraries to think we are react
 
@@ -170,22 +171,6 @@ let classNameDescriptor = {
 	get() { return this.class; }
 };
 
-// Some libraries like `react-virtualized` explicitely check for this.
-Component.prototype.isReactComponent = {};
-
-// Patch in `UNSAFE_*` lifecycle hooks
-function setUnsafeDescriptor(obj, key) {
-	Object.defineProperty(obj.prototype, 'UNSAFE_' + key, {
-		configurable: true,
-		get() { return this[key]; },
-		set(v) { this[key] = v; }
-	});
-}
-
-setUnsafeDescriptor(Component, 'componentWillMount');
-setUnsafeDescriptor(Component, 'componentWillReceiveProps');
-setUnsafeDescriptor(Component, 'componentWillUpdate');
-
 let oldVNodeHook = options.vnode;
 options.vnode = vnode => {
 	vnode.$$typeof = REACT_ELEMENT_TYPE;
@@ -208,6 +193,7 @@ function unstable_batchedUpdates(callback, arg) {
 }
 
 enableForwardRef();
+patchComponent(Component);
 
 export {
 	version,
