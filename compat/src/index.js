@@ -1,9 +1,11 @@
-import { render as preactRender, cloneElement as preactCloneElement, createRef, h, Component, options, toChildArray, createContext, Fragment } from 'preact';
+import { cloneElement as preactCloneElement, createRef, h, Component, options, toChildArray, createContext, Fragment } from 'preact';
 import * as hooks from 'preact/hooks';
 export * from 'preact/hooks';
 import { Suspense as _Suspense, lazy as _lazy, catchRender } from './suspense';
 import { assign } from '../../src/util';
 import { createPortal } from './createPortal';
+import { render } from './render';
+import { unmountComponentAtNode } from './unmountComponentAtNode';
 
 const version = '16.8.0'; // trick libraries to think we are react
 
@@ -47,20 +49,6 @@ function handleElementVNode(vnode, props) {
 			attrs[CAMEL_PROPS.test(i) ? i.replace(/([A-Z0-9])/, '-$1').toLowerCase() : i] = props[i];
 		}
 	}
-}
-
-/**
- * Proxy render() since React returns a Component reference.
- * @param {import('./internal').VNode} vnode VNode tree to render
- * @param {import('./internal').PreactElement} parent DOM node to render vnode tree into
- * @param {() => void} [callback] Optional callback that will be called after rendering
- * @returns {import('./internal').Component | null} The root component reference or null
- */
-function render(vnode, parent, callback) {
-	preactRender(vnode, parent);
-	if (typeof callback==='function') callback();
-
-	return vnode ? vnode._component : null;
 }
 
 const mapFn = (children, fn) => {
@@ -176,19 +164,6 @@ function applyEventNormalization({ type, props }) {
 			delete props[newProps.onchange];
 		}
 	}
-}
-
-/**
- * Remove a component tree from the DOM, including state and event handlers.
- * @param {Element | Document | ShadowRoot | DocumentFragment} container
- * @returns {boolean}
- */
-function unmountComponentAtNode(container) {
-	if (container._children) {
-		preactRender(null, container);
-		return true;
-	}
-	return false;
 }
 
 /**
