@@ -1,12 +1,19 @@
-import { Component, createElement, _unmount as unmount } from 'preact';
+import { Component, createElement, _unmount as unmount, options } from 'preact';
 import { removeNode } from '../../src/util';
+
+export function enableSuspense() {
+	let oldCatchRender = options._catchRender;
+	options._catchRender = (error, newVNode, oldVNode) => (
+		oldCatchRender && oldCatchRender(error, newVNode, oldVNode) || catchRender(error, newVNode, oldVNode)
+	);
+}
 
 /**
  * @param {any} error
  * @param {import('./internal').VNode} newVNode
  * @param {import('./internal').VNode} oldVNode
  */
-export function catchRender(error, newVNode, oldVNode) {
+function catchRender(error, newVNode, oldVNode) {
 	// thrown Promises are meant to suspend...
 	if (error.then) {
 

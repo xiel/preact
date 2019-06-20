@@ -1,7 +1,7 @@
 import { cloneElement as preactCloneElement, createRef, h, Component, options, toChildArray, createContext, Fragment } from 'preact';
 import * as hooks from 'preact/hooks';
 export * from 'preact/hooks';
-import { Suspense as _Suspense, lazy as _lazy, catchRender } from './suspense';
+import { Suspense as _Suspense, lazy as _lazy, enableSuspense } from './suspense';
 import { assign } from '../../src/util';
 
 import { createPortal } from './createPortal';
@@ -28,11 +28,6 @@ options.event = e => {
 	e.persist = () => {};
 	return e.nativeEvent = e;
 };
-
-let oldCatchRender = options._catchRender;
-options._catchRender = (error, newVNode, oldVNode) => (
-	oldCatchRender && oldCatchRender(error, newVNode, oldVNode) || catchRender(error, newVNode, oldVNode)
-);
 
 /**
  * Legacy version of createElement.
@@ -194,6 +189,7 @@ function unstable_batchedUpdates(callback, arg) {
 
 enableForwardRef();
 patchComponent(Component);
+enableSuspense();
 
 export {
 	version,
