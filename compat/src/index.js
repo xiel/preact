@@ -8,6 +8,7 @@ import { createPortal } from './createPortal';
 import { render } from './render';
 import { unmountComponentAtNode } from './unmountComponentAtNode';
 import { Children } from './children';
+import { forwardRef, enableForwardRef } from './forwardRef';
 
 const version = '16.8.0'; // trick libraries to think we are react
 
@@ -246,34 +247,12 @@ setUnsafeDescriptor(Component, 'componentWillMount');
 setUnsafeDescriptor(Component, 'componentWillReceiveProps');
 setUnsafeDescriptor(Component, 'componentWillUpdate');
 
-/**
- * Pass ref down to a child. This is mainly used in libraries with HOCs that
- * wrap components. Using `forwardRef` there is an easy way to get a reference
- * of the wrapped component instead of one of the wrapper itself.
- * @param {import('./internal').ForwardFn} fn
- * @returns {import('./internal').FunctionalComponent}
- */
-function forwardRef(fn) {
-	function Forwarded(props) {
-		let ref = props.ref;
-		delete props.ref;
-		return fn(props, ref);
-	}
-	Forwarded._forwarded = true;
-	Forwarded.displayName = 'ForwardRef(' + (fn.displayName || fn.name) + ')';
-	return Forwarded;
-}
-
 let oldVNodeHook = options.vnode;
 options.vnode = vnode => {
 	vnode.$$typeof = REACT_ELEMENT_TYPE;
 
 	applyEventNormalization(vnode);
-	let type = vnode.type;
-	if (type && type._forwarded && vnode.ref) {
-		vnode.props.ref = vnode.ref;
-		vnode.ref = null;
-	}
+
 	/* istanbul ignore next */
 	if (oldVNodeHook) oldVNodeHook(vnode);
 };
@@ -288,6 +267,8 @@ options.vnode = vnode => {
 function unstable_batchedUpdates(callback, arg) {
 	callback(arg);
 }
+
+enableForwardRef();
 
 export {
 	version,
