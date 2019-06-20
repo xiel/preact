@@ -3,9 +3,11 @@ import * as hooks from 'preact/hooks';
 export * from 'preact/hooks';
 import { Suspense as _Suspense, lazy as _lazy, catchRender } from './suspense';
 import { assign } from '../../src/util';
+
 import { createPortal } from './createPortal';
 import { render } from './render';
 import { unmountComponentAtNode } from './unmountComponentAtNode';
+import { Children } from './children';
 
 const version = '16.8.0'; // trick libraries to think we are react
 
@@ -50,26 +52,6 @@ function handleElementVNode(vnode, props) {
 		}
 	}
 }
-
-const mapFn = (children, fn) => {
-	if (!children) return null;
-	return toChildArray(children).map(fn);
-};
-
-// This API is completely unnecessary for Preact, so it's basically passthrough.
-let Children = {
-	map: mapFn,
-	forEach: mapFn,
-	count(children) {
-		return children ? toChildArray(children).length : 0;
-	},
-	only(children) {
-		children = toChildArray(children);
-		if (children.length!==1) throw new Error('Children.only() expects only one child.');
-		return children[0];
-	},
-	toArray: toChildArray
-};
 
 /**
  * Wrap `createElement` to apply various vnode normalizations.
