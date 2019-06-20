@@ -1,8 +1,9 @@
-import { hydrate, render as preactRender, cloneElement as preactCloneElement, createRef, h, Component, options, toChildArray, createContext, Fragment } from 'preact';
+import { render as preactRender, cloneElement as preactCloneElement, createRef, h, Component, options, toChildArray, createContext, Fragment } from 'preact';
 import * as hooks from 'preact/hooks';
 export * from 'preact/hooks';
 import { Suspense as _Suspense, lazy as _lazy, catchRender } from './suspense';
 import { assign } from '../../src/util';
+import { createPortal } from './createPortal';
 
 const version = '16.8.0'; // trick libraries to think we are react
 
@@ -60,44 +61,6 @@ function render(vnode, parent, callback) {
 	if (typeof callback==='function') callback();
 
 	return vnode ? vnode._component : null;
-}
-
-class ContextProvider {
-	getChildContext() {
-		return this.props.context;
-	}
-	render(props) {
-		return props.children;
-	}
-}
-
-/**
- * Portal component
- * @param {object | null | undefined} props
- */
-function Portal(props) {
-	let wrap = h(ContextProvider, { context: this.context }, props.vnode);
-	let container = props.container;
-
-	if (props.container !== this.container) {
-		hydrate('', container);
-		this.container = container;
-	}
-
-	render(wrap, container);
-	this.componentWillUnmount = () => {
-		render(null, container);
-	};
-	return null;
-}
-
-/**
- * Create a `Portal` to continue rendering the vnode tree at a different DOM node
- * @param {import('./internal').VNode} vnode The vnode to render
- * @param {import('./internal').PreactElement} container The DOM node to continue rendering in to.
- */
-function createPortal(vnode, container) {
-	return h(Portal, { vnode, container });
 }
 
 const mapFn = (children, fn) => {
