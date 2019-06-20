@@ -12,6 +12,7 @@ import { memo } from './memo';
 import { PureComponent } from './PureComponent';
 import { findDOMNode } from './findDOMNode';
 import { patchComponent } from './Component';
+import { applyEventNormalization } from './events';
 
 const version = '16.8.0'; // trick libraries to think we are react
 
@@ -19,14 +20,6 @@ const version = '16.8.0'; // trick libraries to think we are react
 const REACT_ELEMENT_TYPE = (typeof Symbol!=='undefined' && Symbol.for && Symbol.for('react.element')) || 0xeac7;
 
 const CAMEL_PROPS = /^(?:accent|alignment|arabic|baseline|cap|clip|color|fill|flood|font|glyph|horiz|marker|overline|paint|stop|strikethrough|stroke|text|underline|unicode|units|v|vector|vert|word|writing|x)[A-Z]/;
-
-let oldEventHook = options.event;
-options.event = e => {
-	/* istanbul ignore next */
-	if (oldEventHook) e = oldEventHook(e);
-	e.persist = () => {};
-	return e.nativeEvent = e;
-};
 
 /**
  * Legacy version of createElement.
@@ -120,34 +113,6 @@ function isValidElement(element) {
 }
 
 /**
- * Normalize event handlers like react does. Most famously it uses `onChange` for any input element.
- * @param {import('./internal').VNode} vnode The vnode to normalize events on
- */
-function applyEventNormalization({ type, props }) {
-	if (!props || typeof type!='string') return;
-	let newProps = {};
-	for (let i in props) {
-		newProps[i.toLowerCase()] = i;
-	}
-	if (newProps.ondoubleclick) {
-		props.ondblclick = props[newProps.ondoubleclick];
-		delete props[newProps.ondoubleclick];
-	}
-	if (newProps.onbeforeinput) {
-		props.onbeforeinput = props[newProps.onbeforeinput];
-		delete props[newProps.onbeforeinput];
-	}
-	// for *textual inputs* (incl textarea), normalize `onChange` -> `onInput`:
-	if (newProps.onchange && (type==='textarea' || (type.toLowerCase()==='input' && !/^fil|che|rad/i.test(props.type)))) {
-		let normalized = newProps.oninput || 'oninput';
-		if (!props[normalized]) {
-			props[normalized] = props[newProps.onchange];
-			delete props[newProps.onchange];
-		}
-	}
-}
-
-/**
  * Alias `class` prop to `className` if available
  * @param {import('./internal').VNode} vnode
  */
@@ -169,7 +134,6 @@ let oldVNodeHook = options.vnode;
 options.vnode = vnode => {
 	vnode.$$typeof = REACT_ELEMENT_TYPE;
 
-	applyEventNormalization(vnode);
 
 	/* istanbul ignore next */
 	if (oldVNodeHook) oldVNodeHook(vnode);
@@ -187,6 +151,7 @@ function unstable_batchedUpdates(callback, arg) {
 }
 
 enableForwardRef();
+applyEventNormalization();
 patchComponent(Component);
 enableSuspense();
 
