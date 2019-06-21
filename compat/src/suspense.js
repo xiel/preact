@@ -1,7 +1,7 @@
 import { Component, createElement, _unmount as unmount, options } from 'preact';
 import { removeNode } from '../../src/util';
 
-export function enableSuspense() {
+export function installSuspense() {
 	let oldCatchRender = options._catchRender;
 	options._catchRender = (error, newVNode, oldVNode) => (
 		oldCatchRender && oldCatchRender(error, newVNode, oldVNode) || catchRender(error, newVNode, oldVNode)

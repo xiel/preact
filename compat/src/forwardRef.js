@@ -1,6 +1,6 @@
 import { options } from 'preact';
 
-export function enableForwardRef() {
+export function installForwardRef() {
 	let oldVNodeHook = options.vnode;
 	options.vnode = vnode => {
 		let type = vnode.type;

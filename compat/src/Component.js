@@ -1,4 +1,6 @@
-export function patchComponent(Component) {
+import { Component } from 'preact';
+
+export function installComponentCompat() {
 	// Some libraries like `react-virtualized` explicitely check for this.
 	Component.prototype.isReactComponent = {};
 

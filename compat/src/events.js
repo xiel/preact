@@ -1,6 +1,6 @@
 import { options } from 'preact';
 
-export function applyEventNormalization() {
+export function installEventNormalization() {
 	const oldEventHook = options.event;
 	const oldVNodeHook = options.vnode;
 

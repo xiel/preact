@@ -1,18 +1,18 @@
 import { cloneElement as preactCloneElement, createRef, h, Component, options, toChildArray, createContext, Fragment } from 'preact';
 import * as hooks from 'preact/hooks';
-import { Suspense as _Suspense, lazy as _lazy, enableSuspense } from './suspense';
+import { Suspense as _Suspense, lazy as _lazy, installSuspense } from './suspense';
 import { assign } from '../../src/util';
 
 import { createPortal } from './createPortal';
 import { render } from './render';
 import { unmountComponentAtNode } from './unmountComponentAtNode';
 import { Children } from './children';
-import { forwardRef, enableForwardRef } from './forwardRef';
+import { forwardRef, installForwardRef } from './forwardRef';
 import { memo } from './memo';
 import { PureComponent } from './PureComponent';
 import { findDOMNode } from './findDOMNode';
-import { patchComponent } from './Component';
-import { applyEventNormalization } from './events';
+import { installComponentCompat } from './Component';
+import { installEventNormalization } from './events';
 
 const version = '16.8.0'; // trick libraries to think we are react
 
@@ -148,10 +148,10 @@ options.vnode = vnode => {
 // eslint-disable-next-line camelcase
 const unstable_batchedUpdates = (callback, arg) => callback(arg);
 
-enableForwardRef();
-applyEventNormalization();
-patchComponent(Component);
-enableSuspense();
+installForwardRef();
+installEventNormalization();
+installComponentCompat();
+installSuspense();
 
 export * from 'preact/hooks';
 export {
