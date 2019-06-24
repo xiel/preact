@@ -1,17 +1,11 @@
 import React, {
 	render,
-	createElement,
 	cloneElement,
-	findDOMNode,
 	unmountComponentAtNode,
-	createFactory,
 	unstable_batchedUpdates
 } from '../../src';
 import { createElement as preactH } from 'preact';
 import { setupScratch, teardown, createEvent } from '../../../test/_util/helpers';
-
-let ce = type => document.createElement(type);
-let text = text => document.createTextNode(text);
 
 describe('preact-compat', () => {
 
@@ -24,89 +18,6 @@ describe('preact-compat', () => {
 
 	afterEach(() => {
 		teardown(scratch);
-	});
-
-	describe('render()', () => {
-		it('should replace isomorphic content', () => {
-			let root = ce('div');
-			let initialChild = ce('div');
-			initialChild.appendChild(text('initial content'));
-			root.appendChild(initialChild);
-
-			render(<div>dynamic content</div>, root);
-			expect(root)
-				.to.have.property('textContent')
-				.that.is.a('string')
-				.that.equals('dynamic content');
-		});
-
-		it('should remove extra elements', () => {
-			let root = ce('div');
-			let inner = ce('div');
-
-			root.appendChild(inner);
-
-			let c1 = ce('div');
-			c1.appendChild(text('isomorphic content'));
-			inner.appendChild(c1);
-
-			let c2 = ce('div');
-			c2.appendChild(text('extra content'));
-			inner.appendChild(c2);
-
-			render(<div>dynamic content</div>, root);
-			expect(root)
-				.to.have.property('textContent')
-				.that.is.a('string')
-				.that.equals('dynamic content');
-		});
-
-		// Note: Replacing text nodes inside the root itself is currently unsupported.
-		// We do replace them everywhere else, though.
-		it('should remove text nodes', () => {
-			let root = ce('div');
-
-			let div = ce('div');
-			root.appendChild(div);
-			div.appendChild(text('Text Content'));
-			div.appendChild(text('More Text Content'));
-
-			render(<div>dynamic content</div>, root);
-			expect(root)
-				.to.have.property('textContent')
-				.that.is.a('string')
-				.that.equals('dynamic content');
-		});
-
-		it('should support defaultValue', () => {
-			render(<input defaultValue="foo" />, scratch);
-			expect(scratch.firstElementChild).to.have.property('value', 'foo');
-		});
-
-		it('should ignore defaultValue when value is 0', () => {
-			render(<input defaultValue={2} value={0} />, scratch);
-			expect(scratch.firstElementChild.value).to.equal('0');
-		});
-
-		it('should call the callback', () => {
-			let spy = sinon.spy();
-			render(<div />, scratch, spy);
-			expect(spy).to.be.calledOnce;
-			expect(spy).to.be.calledWithExactly();
-		});
-	});
-
-	describe('createFactory', () => {
-		it('should create a DOM element', () => {
-			render(createFactory('span', null)(), scratch);
-			expect(scratch.firstChild.nodeName).to.equal('SPAN');
-		});
-
-		it('should create a component', () => {
-			const Foo = () => <div>foo</div>;
-			render(createFactory(Foo, null)(), scratch);
-			expect(scratch.textContent).to.equal('foo');
-		});
 	});
 
 	describe('createElement()', () => {
@@ -223,44 +134,6 @@ describe('preact-compat', () => {
 			let clone = cloneElement(preactH(Foo), { value: 'foo' });
 			render(clone, scratch);
 			expect(scratch.textContent).to.equal('foo');
-		});
-	});
-
-	describe('findDOMNode()', () => {
-		class Helper extends React.Component {
-			render({ something }) {
-				if (something == null) return null;
-				if (something === false) return null;
-				return <div />;
-			}
-		}
-
-		it.skip('should return DOM Node if render is not false nor null', () => {
-			const helper = React.render(<Helper />, scratch);
-			expect(findDOMNode(helper)).to.be.instanceof(Node);
-		});
-
-		it('should return null if given null', () => {
-			expect(findDOMNode(null)).to.be.null;
-		}),
-
-		it('should return a regular DOM Element if given a regular DOM Element', () => {
-			let scratch = document.createElement('div');
-			expect(findDOMNode(scratch)).to.equalNode(scratch);
-		}),
-
-		// NOTE: React.render() returning false or null has the component pointing
-		// 			to no DOM Node, in contrast, Preact always render an empty Text DOM Node.
-		it('should return null if render returns false', () => {
-			const helper = React.render(<Helper something={false} />, scratch);
-			expect(findDOMNode(helper)).to.be.null;
-		});
-
-		// NOTE: React.render() returning false or null has the component pointing
-		// 			to no DOM Node, in contrast, Preact always render an empty Text DOM Node.
-		it('should return null if render returns null', () => {
-			const helper = React.render(<Helper something={null} />, scratch);
-			expect(findDOMNode(helper)).to.be.null;
 		});
 	});
 
