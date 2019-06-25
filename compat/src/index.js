@@ -1,6 +1,6 @@
 import { createRef, Component, createContext, Fragment } from 'preact';
 import * as hooks from 'preact/hooks';
-import { Suspense as _Suspense, lazy as _lazy, installSuspense } from './suspense';
+import { Suspense, lazy, installSuspense } from './suspense';
 import { assign } from '../../src/util';
 
 import { createPortal } from './createPortal';
@@ -53,11 +53,10 @@ export {
 	memo,
 	forwardRef,
 	// eslint-disable-next-line camelcase
-	unstable_batchedUpdates
+	unstable_batchedUpdates,
+	Suspense,
+	lazy
 };
-
-export const Suspense = _Suspense;
-export const lazy = _lazy;
 
 // React copies the named exports to the default one.
 export default assign({
@@ -79,5 +78,7 @@ export default assign({
 	PureComponent,
 	memo,
 	forwardRef,
-	unstable_batchedUpdates
+	unstable_batchedUpdates,
+	Suspense,
+	lazy
 }, hooks);
