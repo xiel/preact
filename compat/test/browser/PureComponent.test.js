@@ -19,6 +19,12 @@ describe('PureComponent', () => {
 		teardown(scratch);
 	});
 
+	it('should have "isPureReactComponent" property', () => {
+		let Pure = new React.PureComponent();
+		expect(Pure.isReactComponent).to.deep.equal({});
+		expect(Pure.isPureReactComponent).to.be.true;
+	});
+
 	it('should be a class', () => {
 		expect(React).to.have.property('PureComponent').that.is.a('function');
 	});

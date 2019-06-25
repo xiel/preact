@@ -17,9 +17,6 @@ describe('components', () => {
 	it('should have "isReactComponent" property', () => {
 		let Comp = new React.Component();
 		expect(Comp.isReactComponent).to.deep.equal({});
-
-		let Pure = new React.PureComponent();
-		expect(Pure.isReactComponent).to.deep.equal({});
 	});
 
 	it('should be sane', () => {
@@ -52,6 +49,9 @@ describe('components', () => {
 		class Child extends React.Component {
 			componentWillReceiveProps(newProps) {
 				props = newProps;
+			}
+			render() {
+				return this.props.children;
 			}
 		}
 
