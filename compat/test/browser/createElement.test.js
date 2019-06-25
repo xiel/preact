@@ -1,6 +1,6 @@
 import React, { render, createFactory, isValidElement, cloneElement } from '../../src';
 import { h as preactH } from 'preact';
-import { setupScratch, teardown, createEvent } from '../../../test/_util/helpers';
+import { setupScratch, teardown } from '../../../test/_util/helpers';
 
 describe('compat', () => {
 
