@@ -1,6 +1,8 @@
 import React, { render, unmountComponentAtNode } from '../../src';
 import { setupScratch, teardown } from '../../../test/_util/helpers';
 
+/** @jsx React.createElement */
+
 describe('unmountComponentAtNode', () => {
 
 	/** @type {HTMLDivElement} */

@@ -4,6 +4,8 @@ import { setupScratch, teardown } from '../../../test/_util/helpers';
 let ce = type => document.createElement(type);
 let text = text => document.createTextNode(text);
 
+/** @jsx React.createElement */
+
 describe('compat', () => {
 	describe('render', () => {
 
