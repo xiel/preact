@@ -73,6 +73,7 @@ describe('debug with suspense', () => {
 				</Suspense>
 			);
 			render(suspense, scratch);
+			rerender(); // Render fallback
 
 			expect(console.error).to.not.be.called;
 

@@ -16,7 +16,7 @@ options._catchError = function (error, newVNode, oldVNode) {
 					newVNode._children = oldVNode._children;
 				}
 
-				component._childDidSuspend(error);
+				component._childDidSuspend(error, newVNode._component);
 				return; // Don't call oldCatchError if we found a Suspense
 			}
 		}
@@ -53,8 +53,9 @@ Suspense.prototype = new Component();
 
 /**
  * @param {Promise} promise The thrown promise
+ * @param {import('./internal').Component} suspender The component that threw a promise
  */
-Suspense.prototype._childDidSuspend = function(promise) {
+Suspense.prototype._childDidSuspend = function(promise, suspender) {
 
 	/** @type {import('./internal').SuspenseComponent} */
 	const c = this;
@@ -76,6 +77,7 @@ Suspense.prototype._childDidSuspend = function(promise) {
 
 			c._vnode._children = c.state._parkedChildren;
 			c.setState({ _parkedChildren: null });
+			suspender.forceUpdate();
 		}
 	};
 
