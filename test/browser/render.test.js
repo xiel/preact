@@ -716,9 +716,13 @@ describe('render()', () => {
 
 			render(<div onClick={falsyHandler} onOtherClick={fooHandler} />, scratch);
 
-			expect(scratch.childNodes[0]._listeners).to.deep.equal({
-				OtherClick: fooHandler
-			});
+			expect(
+				proto.addEventListener
+			).to.have.been.calledOnce.and.to.have.been.calledWithExactly(
+				'OtherClick',
+				sinon.match.func,
+				false
+			);
 		});
 
 		it('should support native event names', () => {

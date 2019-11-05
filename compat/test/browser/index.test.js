@@ -24,7 +24,7 @@ describe('preact-compat', () => {
 
 	beforeEach(() => {
 		scratch = setupScratch();
-		proto = document.createElement('div').constructor.prototype;
+		proto = Element.prototype;
 		sinon.spy(proto, 'addEventListener');
 		sinon.spy(proto, 'removeEventListener');
 	});
@@ -95,7 +95,7 @@ describe('preact-compat', () => {
 		});
 
 		it('should support onAnimationEnd', () => {
-			const func = () => {};
+			const func = sinon.spy(() => {});
 			render(<div onAnimationEnd={func} />, scratch);
 
 			expect(
@@ -106,9 +106,8 @@ describe('preact-compat', () => {
 				false
 			);
 
-			expect(scratch.firstChild._listeners).to.deep.equal({
-				animationend: func
-			});
+			scratch.firstChild.dispatchEvent(createEvent('animationend'));
+			expect(func).to.have.been.calledOnce;
 
 			render(<div />, scratch);
 			expect(
@@ -121,7 +120,7 @@ describe('preact-compat', () => {
 		});
 
 		it('should support onTransitionEnd', () => {
-			const func = () => {};
+			const func = sinon.spy(() => {});
 			render(<div onTransitionEnd={func} />, scratch);
 
 			expect(
@@ -132,9 +131,8 @@ describe('preact-compat', () => {
 				false
 			);
 
-			expect(scratch.firstChild._listeners).to.deep.equal({
-				transitionend: func
-			});
+			scratch.firstChild.dispatchEvent(createEvent('transitionend'));
+			expect(func).to.have.been.calledOnce;
 
 			render(<div />, scratch);
 			expect(
@@ -458,8 +456,12 @@ describe('preact-compat', () => {
 
 	it('should not normalize onChange for range', () => {
 		render(<input type="range" onChange={() => null} />, scratch);
-		expect(scratch.firstChild._listeners).to.haveOwnProperty('change');
-		expect(scratch.firstChild._listeners).to.not.haveOwnProperty('input');
+		expect(proto.addEventListener).to.have.been.calledOnce;
+		expect(proto.addEventListener).to.have.been.calledWithExactly(
+			'change',
+			sinon.match.func,
+			false
+		);
 	});
 
 	it('should normalize class+className even on components', () => {
