@@ -158,8 +158,12 @@ describe('suspense', () => {
 	});
 
 	it('lazy should forward refs', () => {
-		const LazyComp = () => <div>Hello from LazyComp</div>;
 		let ref = {};
+		class LazyComp {
+			render() {
+				return <div>Hello from LazyComp</div>;
+			}
+		}
 
 		/** @type {() => Promise<void>} */
 		let resolve;
@@ -184,7 +188,7 @@ describe('suspense', () => {
 
 		return resolve().then(() => {
 			rerender();
-			expect(ref.current._vnode.type).to.equal(LazyComp);
+			expect(ref.current.constructor).to.equal(LazyComp);
 		});
 	});
 
